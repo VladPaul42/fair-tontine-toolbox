@@ -34,20 +34,45 @@ Same pool: conditional annual payout while alive ±1σ:
 
 [Full plot gallery](docs/RESULTS.md)
 
-## Why I built this
+## The problem
 
-While looking for projects for a quant-focused portfolio, I came across tontines. At first glance they looked like a peculiar scheme: you benefit when others in the pool die. That shocked me at first and pushed me to read further.
+A tontine is a pool where members put in capital and receive income for as long as they live. When a member dies, their share stays in the pool and goes to the survivors. Nobody guarantees the payments, so no insurer has to hold capital against people living longer than expected. That is what makes a tontine cheaper than an annuity: the pool carries its own longevity risk.
 
-A deeper dive changed the picture. Modern tontine design is less about morbid speculation and more about pooling longevity risk efficiently. I discovered it to be a potential key to **freeing up billions in pension funds reserves.**
-## What this project does
+The catch appears when members differ. Put a 50-year-old and a 70-year-old in the same pool on equal terms, and the 50-year-old can expect to collect for many more years, largely funded by what the 70-year-old leaves behind. The same happens when one member invests far more than the rest. Without an adjustment, one group quietly subsidizes another. The usual workaround is a separate pool for each age band, but that makes every pool smaller and its payouts more volatile.
 
-This toolbox addresses a concrete problem from historical tontines: **unfairness when different ages and stake sizes share one pool**. It implements a **participation-rate (π) pricer** for a heterogeneous client base—who pays a premium or discount per share so that mixed cohorts can pool without discriminating by age or investment size.
+## The fix: participation rates
 
-It also turns dense, math-heavy academic work into something you can **run, plot, and stress-test** in notebooks—so the mechanics of equitable pooling are easier to grasp than from the paper alone.
+Milevsky & Salisbury (2016) show that a mixed pool can be fair if each member's claim is scaled by a **participation rate π**. A member's claim on each payout is `π × amount invested`, so π > 1 gives someone more than one share per dollar to make up for a lower chance of being alive to collect.
 
-## What I learned
+The pool is fair when every member gets the same expected present value per dollar invested, whatever their age, sex, or contribution size. This toolbox solves for the π values that achieve that.
 
-You should not dismiss an idea because of a bad first impression, or because it is old (tontines date to the 17th century). The real question is whether the it can solve a real problem today.
+For example, take a pool of forty men, ten each aged 40, 50, 60, and 70, each investing $100 (SSA mortality, 3% interest):
+
+| Age | π    |
+|-----|------|
+| 40  | 1.00 |
+| 50  | 1.17 |
+| 60  | 1.47 |
+| 70  | 2.00 |
+
+A 70-year-old needs about twice the claim per dollar of a 40-year-old to get an equally good deal. In a two-cohort pool of 100 fifty-year-olds and 100 seventy-year-olds, the older cohort's π comes out at 1.69.
+
+## How it works
+
+1. **Mortality.** Death probabilities from the SSA period life table are turned into survival curves. They are also compared with the Gompertz law used in the paper.
+2. **Payout schedule.** The pool's total payout rate over time, d(t), is a capital-weighted blend of each member's "natural" payout rate: survival probability divided by annuity factor. This is the optimal schedule for a log-utility investor.
+3. **Solving for π.** Both solvers start every π at 1. They then repeatedly raise π for whoever currently has the worst deal until all expected values are equal.
+   - **Combinatorial state solver** (cohorts of identical members): enumerates every combination of survivors to get exact expected values. The number of states grows as the product of (cohort size + 1), so it is only practical for a few cohorts.
+   - **Delta-method approximator** (every member can be different): estimates each member's expected share of payouts with a second-order Taylor expansion. It scales to large pools at the cost of a small approximation error.
+4. **Checking the result.** Monte Carlo simulation of the solved pool shows payout paths and their spread. Each member gets a lifetime log-utility score. The outlier notebook replicates the paper's curves showing how π moves for a single member whose age or contribution differs from the rest of the pool.
+
+## Assumptions and limitations
+
+- Log utility (γ = 1) only. The natural payout schedule is optimal only in that case.
+- A constant risk-free rate (3% by default) and no investment risk.
+- A 2021 period life table with no future mortality improvement, and deaths assumed independent.
+- The exact solver's cost grows exponentially with the number of cohorts. Use the delta method for anything larger.
+- This is a pricing model, not a product. Fees, adverse selection, lapses, and regulation are out of scope.
 
 ## Requirements
 
