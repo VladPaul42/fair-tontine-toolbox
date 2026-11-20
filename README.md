@@ -4,6 +4,29 @@ Jupyter notebooks that price equitable participation rates (π) for mixed-cohort
 
 **Disclaimer:** This project is for research and educational purposes only. It is not financial, investment, or actuarial advice.
 
+## The problem
+
+A tontine is a pool where members put in capital and receive income for as long as they live. When a member dies, their share stays in the pool and goes to the survivors. Nobody guarantees the payments, so no insurer has to hold capital against people living longer than expected. That is what makes a tontine cheaper than an annuity: the pool carries its own longevity risk.
+
+The catch appears when members differ. Put a 50-year-old and a 70-year-old in the same pool on equal terms, and the 50-year-old can expect to collect for many more years, largely funded by what the 70-year-old leaves behind. The same happens when one member invests far more than the rest. Without an adjustment, one group quietly subsidizes another. The usual workaround is a separate pool for each age band, but that makes every pool smaller and its payouts more volatile.
+
+## The fix: participation rates
+
+Milevsky & Salisbury (2016) show that a mixed pool can be fair if each member's claim is scaled by a **participation rate π**. A member's claim on each payout is `π × amount invested`, so π > 1 gives someone more than one share per dollar to make up for a lower chance of being alive to collect.
+
+The pool is fair when every member gets the same expected present value per dollar invested, whatever their age, sex, or contribution size. This toolbox solves for the π values that achieve that.
+
+For example, take a pool of forty men, ten each aged 40, 50, 60, and 70, each investing $100 (SSA mortality, 3% interest):
+
+| Age | π    |
+|-----|------|
+| 40  | 1.00 |
+| 50  | 1.17 |
+| 60  | 1.47 |
+| 70  | 2.00 |
+
+A 70-year-old needs about twice the claim per dollar of a 40-year-old to get an equally good deal. In a two-cohort pool of 100 fifty-year-olds and 100 seventy-year-olds, the older cohort's π comes out at 1.69.
+
 ## Example results
 
 Pre-rendered outputs from the notebooks. You can view them here without running anything.
@@ -33,29 +56,6 @@ Same pool: conditional annual payout while alive ±1σ:
 ![20,000-member mixed cohort, conditional payout](docs/plots/mixed-cohort-50-60yo-20000-conditional-payout.png)
 
 [Full plot gallery](docs/RESULTS.md)
-
-## The problem
-
-A tontine is a pool where members put in capital and receive income for as long as they live. When a member dies, their share stays in the pool and goes to the survivors. Nobody guarantees the payments, so no insurer has to hold capital against people living longer than expected. That is what makes a tontine cheaper than an annuity: the pool carries its own longevity risk.
-
-The catch appears when members differ. Put a 50-year-old and a 70-year-old in the same pool on equal terms, and the 50-year-old can expect to collect for many more years, largely funded by what the 70-year-old leaves behind. The same happens when one member invests far more than the rest. Without an adjustment, one group quietly subsidizes another. The usual workaround is a separate pool for each age band, but that makes every pool smaller and its payouts more volatile.
-
-## The fix: participation rates
-
-Milevsky & Salisbury (2016) show that a mixed pool can be fair if each member's claim is scaled by a **participation rate π**. A member's claim on each payout is `π × amount invested`, so π > 1 gives someone more than one share per dollar to make up for a lower chance of being alive to collect.
-
-The pool is fair when every member gets the same expected present value per dollar invested, whatever their age, sex, or contribution size. This toolbox solves for the π values that achieve that.
-
-For example, take a pool of forty men, ten each aged 40, 50, 60, and 70, each investing $100 (SSA mortality, 3% interest):
-
-| Age | π    |
-|-----|------|
-| 40  | 1.00 |
-| 50  | 1.17 |
-| 60  | 1.47 |
-| 70  | 2.00 |
-
-A 70-year-old needs about twice the claim per dollar of a 40-year-old to get an equally good deal. In a two-cohort pool of 100 fifty-year-olds and 100 seventy-year-olds, the older cohort's π comes out at 1.69.
 
 ## How it works
 
